@@ -8,22 +8,37 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+      - name: Autobuild CodeQL
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+
+      - name: Install node dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate || true
+          npm audit --json > npm-audit.json || true
+
+
       - name: Build Docker image For Scanning
         run: docker build -t vulnerable-web-app:latest .
-
-      - name: Run Semgrep SAST
-        uses: returntocorp/semgrep-action@v1
-        with:
-              config: |
-                p/security-audit
-                p/javascript
-                p/owasp-top-ten
-        continue-on-error: true
-
+  
       - name: Trivy container scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
