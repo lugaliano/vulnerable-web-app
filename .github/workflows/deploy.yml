@@ -74,3 +74,25 @@ jobs:
           heroku_email: "luciaagaliano@gmail.com"
           branch: "master"
           usedocker: true
+
+
+
+  zap-scan:
+    name: ZAP Security Scan
+    needs: deploy-heroku
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: owasp/zap2docker-stable
+          format: openapi
+          target: https://app-vulnerable-lucia-galiano.herokuapp.com
+          cmd_options: -a
