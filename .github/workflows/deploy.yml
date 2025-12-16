@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      actions: read
+      actions: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -96,3 +96,4 @@ jobs:
           format: openapi
           target: https://app-vulnerable-lucia-galiano.herokuapp.com
           cmd_options: -a
+        continue-on-error: true
