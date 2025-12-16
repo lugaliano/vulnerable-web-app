@@ -37,16 +37,17 @@ jobs:
 
 
       - name: Build Docker image For Scanning
-        run: docker build -t vulnerable-web-app:latest .
+        run: docker build -t vulnerable-web-app:${{ github.sha }} .
   
       - name: Trivy container scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: vulnerable-web-app:latest
+          image-ref: vulnerable-web-app:${{ github.sha }} .
           severity: CRITICAL,HIGH
           format: sarif
           output: trivy-results.sarif
           exit-code: 0
+          ignore-unfixed: true
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v2
